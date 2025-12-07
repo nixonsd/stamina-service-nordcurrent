@@ -1,10 +1,25 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
+import { sendApi } from '../../shared/helpers/send-api.helper';
+import { SyncUserStatsUseCase } from '../application/use-cases/sync-user-stats.use-case';
+import { PostgresUserStatsRepository } from './repositories/postgres-user-stats.repository';
+import { logger } from '../../shared/logger';
 
-const router = express.Router();
+export async function createSyncController() {
+  const router = express.Router();
 
-// Define your sync-related routes here
-router.post('/', (req, res) => {
-  res.json({ hello: 'world' });
-});
+  try {
+    // Dependency wiring done at runtime
+    const postgresUserStatsRepository = new PostgresUserStatsRepository();
+    const syncUserStatsUseCase = new SyncUserStatsUseCase(postgresUserStatsRepository);
 
-export { router as syncController };
+    router.post('/', async (req: Request, res: Response) => {
+      const result = await syncUserStatsUseCase.execute(req.body);
+      sendApi(res, 200, 'OK', result);
+    });
+  } catch (error) {
+    logger.error(`[SyncController] Failed to create controller: ${error}`);
+    throw error;
+  }
+
+  return router;
+}

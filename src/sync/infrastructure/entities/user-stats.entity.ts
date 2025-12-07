@@ -35,8 +35,8 @@ export class UserStatsEntity {
   })
   staminaBase!: number;
 
-  @Column({ name: 'stamina_last_ts', type: 'bigint' })
-  staminaLastTs!: number; // seconds since epoch
+  @Column({ name: 'stamina_last_update_ts', type: 'bigint' })
+  staminaLastUpdateTs!: number; // seconds since epoch
 
   @Column({
     name: 'stamina_regen_per_sec',

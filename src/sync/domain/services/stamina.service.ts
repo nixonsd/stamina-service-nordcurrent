@@ -1,30 +1,43 @@
 import { UserStats } from '../entities/user-stats.entity';
 
 export class StaminaService {
+  /**
+   * Computes current stamina based on a snapshot taken at staminaLastUpdateTs.
+   * now and staminaLastUpdateTs are expected to be in milliseconds.
+   */
   static computeCurrent(
     staminaBase: number,
-    staminaLastUpdateTs: number,
+    staminaLastUpdateTsMs: number,
     staminaRegenPerSec: number,
     staminaMax: number,
-    now: number
+    nowMs: number
   ): number {
-    const elapsed = Math.max(0, now - staminaLastUpdateTs);
-    const regenerated = staminaBase + elapsed * staminaRegenPerSec;
-    return Math.ceil(Math.min(staminaMax, regenerated));
+    const elapsedMs = Math.max(0, nowMs - staminaLastUpdateTsMs);
+    const elapsedSeconds = Math.floor(elapsedMs / 1000);
+
+    const regenerated = staminaBase + elapsedSeconds * staminaRegenPerSec;
+    const clamped = Math.min(staminaMax, regenerated);
+
+    // Stamina is usually an integer, so we round down
+    return Math.floor(clamped);
   }
 
-  static getCurrentStamina(userStats: UserStats, now: number): number {
+  static getCurrentStamina(userStats: UserStats, nowMs: number): number {
     return this.computeCurrent(
       userStats.staminaBase,
       userStats.staminaLastUpdateTs,
       userStats.staminaRegenPerSec,
       userStats.staminaMax,
-      now
+      nowMs
     );
   }
 
-  static spendStamina(userStats: UserStats, now: number, cost: number): UserStats {
-    const current = this.getCurrentStamina(userStats, now);
+  /**
+   * Spends stamina and updates the snapshot to the current time.
+   * Throws if there is not enough stamina.
+   */
+  static spendStamina(userStats: UserStats, nowMs: number, cost: number): UserStats {
+    const current = this.getCurrentStamina(userStats, nowMs);
     if (current < cost) {
       throw new Error('NOT_ENOUGH_STAMINA');
     }
@@ -34,18 +47,22 @@ export class StaminaService {
     return {
       ...userStats,
       staminaBase: newBase,
-      staminaLastUpdateTs: now,
+      staminaLastUpdateTs: nowMs,
       stateVersion: userStats.stateVersion + 1,
     };
   }
 
-  static freezeAtNow(userStats: UserStats, now: number): UserStats {
-    const current = this.getCurrentStamina(userStats, now);
+  /**
+   * Freezes current stamina at nowMs without changing its value.
+   * Useful when you want to bump stateVersion and persist a fresh snapshot.
+   */
+  static freezeAtNow(userStats: UserStats, nowMs: number): UserStats {
+    const current = this.getCurrentStamina(userStats, nowMs);
 
     return {
       ...userStats,
       staminaBase: current,
-      staminaLastUpdateTs: now,
+      staminaLastUpdateTs: nowMs,
       stateVersion: userStats.stateVersion + 1,
     };
   }

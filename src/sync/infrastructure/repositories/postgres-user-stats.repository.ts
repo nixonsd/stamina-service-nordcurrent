@@ -15,11 +15,14 @@ export class PostgresUserStatsRepository implements UserStatsRepository {
     const entity = await this.userStatsRepository.findOneBy({ userId });
     return entity ? (entity as unknown as UserStats) : null;
   }
-  update(_user: UserStats): Promise<void> {
+
+  async update(_user: UserStats): Promise<void> {
     throw new Error('Method not implemented.');
   }
-  async save(user: UserStats): Promise<void> {
-    const entity = this.userStatsRepository.create(user as unknown as UserStatsEntity);
+
+  async save(userStats: UserStats): Promise<UserStats> {
+    const entity = this.userStatsRepository.create(userStats as unknown as UserStatsEntity);
     await this.userStatsRepository.save(entity);
+    return entity as unknown as UserStats;
   }
 }

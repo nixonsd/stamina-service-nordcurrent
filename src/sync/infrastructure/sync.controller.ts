@@ -1,11 +1,11 @@
-import express, { Request, Response } from 'express';
+import { Router, Request, Response } from 'express';
 import { sendApi } from '../../shared/helpers/send-api.helper';
 import { SyncUserStatsUseCase } from '../application/use-cases/sync-user-stats.use-case';
 import { PostgresUserStatsRepository } from './repositories/postgres-user-stats.repository';
 import { logger } from '../../shared/logger';
 
 export async function createSyncController() {
-  const router = express.Router();
+  const router = Router();
 
   try {
     // Dependency wiring done at runtime

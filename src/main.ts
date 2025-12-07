@@ -5,6 +5,7 @@ import { createSyncController } from './sync/infrastructure/sync.controller';
 import { errorHandler } from './shared/middlewares/error-handler.middleware';
 import { sendApi } from './shared/helpers/send-api.helper';
 import { config } from './config';
+import { createUserController } from './sync/infrastructure/user.controller';
 
 async function bootstrap() {
   try {
@@ -26,6 +27,9 @@ async function bootstrap() {
 
   const syncRouter = await createSyncController();
   app.use('/sync', syncRouter);
+
+  const userRouter = await createUserController();
+  app.use('/user', userRouter);
 
   // Global error handler
   app.use(errorHandler);

@@ -1,50 +1,41 @@
 import { SyncRequestDto, SyncResponseDto } from '../dtos/sync.dto';
 import { StaminaService } from '../../../sync/domain/services/stamina.service';
-import { ConflictError, NotFoundError } from '../../../shared/errors/app-error';
+import { NotFoundError } from '../../../shared/errors/app-error';
 import { UserStatsRepository } from '../../domain/repositories/user-stats.repository';
 
 export class SyncUserStatsUseCase {
   constructor(private readonly userStatsRepository: UserStatsRepository) {}
 
   public async execute(request: SyncRequestDto): Promise<SyncResponseDto> {
-    const now = new Date().getTime() / 1000;
+    const now = new Date().getTime();
 
-    // const currentStats: UserStats = {
-    //   userId: request.userId,
-    //   status: 'ACTIVE',
-    //   blockedAt: null,
-    //   staminaMax: 10,
-    //   staminaBase: 5,
-    //   staminaLastUpdateTs: 1765123744,
-    //   staminaRegenPerSec: 1 / 10,
-    //   stateVersion: 1,
-    // };
-    const currentStats = await this.userStatsRepository.findById(request.userId);
-    if (!currentStats) {
+    const currentUser = await this.userStatsRepository.findById(request.userId);
+    if (!currentUser) {
       throw new NotFoundError('The user stats were not found');
     }
 
-    if (currentStats.status === 'BLOCKED') {
+    if (currentUser.status === 'BLOCKED') {
       // Blocked users do not change stats, but we still return current view
-      const staminaCurrent = StaminaService.getCurrentStamina(currentStats, now);
+      const staminaCurrent = StaminaService.getCurrentStamina(currentUser, now);
       return {
         serverTime: now,
         userStats: {
           staminaCurrent,
-          staminaMax: currentStats.staminaMax,
-          status: currentStats.status,
-          blockedAt: currentStats.blockedAt,
-          stateVersion: currentStats.stateVersion,
+          staminaMax: currentUser.staminaMax,
+          status: currentUser.status,
+          blockedAt: currentUser.blockedAt,
+          stateVersion: currentUser.stateVersion,
         },
       };
     }
 
+    // ! Return back later
     // Reject if client has too old stateVersion
-    if (request.lastStateVersion < currentStats.stateVersion) {
-      throw new ConflictError('State version conflict');
-    }
+    // if (request.lastStateVersion < currentUser.stateVersion) {
+    //   throw new ConflictError('State version conflict');
+    // }
 
-    let newStats = currentStats;
+    let newStats = currentUser;
 
     for (const event of request.events) {
       switch (event.type) {

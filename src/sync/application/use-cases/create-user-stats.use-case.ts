@@ -11,7 +11,7 @@ export class CreateUserStatsUseCase {
       blockedAt: null,
       staminaMax: 10,
       staminaBase: 10,
-      staminaLastUpdateTs: Math.floor(Date.now() / 1000),
+      staminaLastUpdateTs: Date.now(),
       staminaRegenPerSec: 1 / 10,
       stateVersion: 1,
     };

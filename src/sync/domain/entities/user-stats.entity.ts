@@ -1,4 +1,4 @@
-export type UserStatus = 'ACTIVE' | 'BLOCKED';
+import { UserStatus } from '../types/user-status.type';
 
 export interface UserStats {
   userId: string;
@@ -11,13 +11,5 @@ export interface UserStats {
   staminaLastUpdateTs: number; // server time (sec since epoch)
   staminaRegenPerSec: number;
 
-  stateVersion: number;
-}
-
-export interface UserStatsView {
-  staminaCurrent: number;
-  staminaMax: number;
-  status: UserStatus;
-  blockedAt: number | null;
   stateVersion: number;
 }

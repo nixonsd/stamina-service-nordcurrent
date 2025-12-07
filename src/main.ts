@@ -1,16 +1,18 @@
 import express from 'express';
 import { logger } from './shared/logger';
+import { syncController } from './sync/infrastructure/sync.controller';
+import { errorHandler } from './shared/middlewares/error-handler.middleware';
+import { sendApi } from './shared/helpers/send-api.helper';
 
 const app = express();
 
-app.get('/', (req, res) => {
-  res.send('Stamina Service is running!');
+app.get('/health', (req, res) => {
+  sendApi(res, 200, 'OK');
 });
 
-app.post('/stamina', (req, res) => {
-  // Placeholder logic for stamina management
-  res.json({ message: 'Stamina updated successfully!' });
-});
+app.use('/sync', syncController);
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

@@ -9,6 +9,5 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
 
-  // Optional relation
-  stats?: UserStats;
+  stats: UserStats;
 }

@@ -1,74 +1,51 @@
-import { SyncRequestDto, SyncResponseDto } from '../dtos/sync.dto';
-import { StaminaService } from '../../../sync/domain/services/stamina.service';
 import { NotFoundError } from '../../../shared/errors/app-error';
-import { UserStatsRepository } from '../../domain/repositories/user-stats.repository';
+import { UserRepository } from '../../domain/repositories/user.repository';
+import { SyncCommand, SyncResult } from '../types/sync.type';
+import { User } from '../../domain/entities/user.entity';
+import { EventService } from '../../domain/services/event.service';
+import { StaminaService } from '../../domain/services/stamina.service';
 
 export class SyncUserStatsUseCase {
-  constructor(private readonly userStatsRepository: UserStatsRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly eventService: EventService
+  ) {}
 
-  public async execute(request: SyncRequestDto): Promise<SyncResponseDto> {
-    const now = new Date().getTime();
+  public async execute(command: SyncCommand): Promise<SyncResult> {
+    const nowMs = Date.now();
 
-    const currentUser = await this.userStatsRepository.findById(request.userId);
+    const currentUser = await this.userRepository.findById(command.userId);
     if (!currentUser) {
       throw new NotFoundError('The user stats were not found');
     }
 
     if (currentUser.status === 'BLOCKED') {
-      // Blocked users do not change stats, but we still return current view
-      const staminaCurrent = StaminaService.getCurrentStamina(currentUser, now);
-      return {
-        serverTime: now,
-        userStats: {
-          staminaCurrent,
-          staminaMax: currentUser.staminaMax,
-          status: currentUser.status,
-          blockedAt: currentUser.blockedAt,
-          stateVersion: currentUser.stateVersion,
-        },
-      };
+      return this.buildResult(currentUser, nowMs);
     }
 
-    // ! Return back later
-    // Reject if client has too old stateVersion
-    // if (request.lastStateVersion < currentUser.stateVersion) {
+    // if (command.lastStateVersion < currentUser.stats.stateVersion) {
     //   throw new ConflictError('State version conflict');
     // }
 
-    let newStats = currentUser;
+    const updatedUser: User = this.eventService.handle(currentUser, command.events, nowMs);
 
-    for (const event of request.events) {
-      switch (event.type) {
-        case 'LEVEL_START': {
-          // Simple demo: cost 1 stamina per level start
-          const cost = 1;
-          newStats = StaminaService.spendStamina(newStats, now, cost);
-          break;
-        }
-        case 'LEVEL_FINISH': {
-          // For now we do not change stats; later you can add logic based on payload
-          // e.g. reward, difficulty, etc.
-          break;
-        }
-        default: {
-          // Unknown event types are ignored for stats
-          break;
-        }
-      }
-    }
+    await this.userRepository.save(updatedUser);
 
-    await this.userStatsRepository.save(newStats);
+    return this.buildResult(updatedUser, nowMs);
+  }
 
-    const staminaCurrent = StaminaService.getCurrentStamina(newStats, now);
+  private buildResult(user: User, nowMs: number): SyncResult {
+    const staminaCurrent = StaminaService.getCurrentStamina(user, nowMs);
+    const stats = user.stats;
 
     return {
-      serverTime: now,
+      serverTime: nowMs,
       userStats: {
         staminaCurrent,
-        staminaMax: newStats.staminaMax,
-        status: newStats.status,
-        blockedAt: newStats.blockedAt,
-        stateVersion: newStats.stateVersion,
+        staminaMax: stats.staminaMax,
+        status: user.status,
+        blockedAt: user.blockedAt,
+        stateVersion: stats.stateVersion,
       },
     };
   }

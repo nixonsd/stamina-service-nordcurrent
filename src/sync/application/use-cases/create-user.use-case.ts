@@ -1,5 +1,5 @@
-import { User } from 'src/sync/domain/entities/user.entity';
-import { UserRepository } from 'src/sync/domain/repositories/user.repository';
+import { User } from '../../domain/entities/user.entity';
+import { UserRepository } from '../../domain/repositories/user.repository';
 
 export class CreateUserUseCase {
   constructor(private readonly userRepo: UserRepository) {}

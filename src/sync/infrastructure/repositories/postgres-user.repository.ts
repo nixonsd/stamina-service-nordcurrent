@@ -12,7 +12,7 @@ export class PostgresUserRepository implements UserRepository {
   }
 
   async findById(userId: string): Promise<User | null> {
-    const entity = await this.userRepository.findOneBy({ id: userId });
+    const entity = await this.userRepository.findOne({ where: { id: userId }, relations: ['stats'] });
     return entity ? (entity as unknown as User) : null;
   }
 

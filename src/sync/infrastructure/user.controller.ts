@@ -4,6 +4,7 @@ import { CreateUserUseCase } from '../application/use-cases/create-user.use-case
 import { PostgresUserRepository } from './repositories/postgres-user.repository';
 import { User } from '../domain/entities/user.entity';
 import { logger } from '../../shared/logger';
+import { sendApi } from 'src/shared/helpers/send-api.helper';
 
 export function createUserController() {
   const router = Router();
@@ -39,10 +40,10 @@ export function createUserController() {
 
       const createdUser = await createUserUseCase.execute(user);
 
-      return res.status(201).json(createdUser);
+      return sendApi(res, 201, 'Created', createdUser);
     } catch (error) {
       logger.error(`Create user failed: ${error}`);
-      return res.status(500).json({ error: 'Internal Server Error' });
+      return sendApi(res, 500, 'Internal Server Error');
     }
   });
 

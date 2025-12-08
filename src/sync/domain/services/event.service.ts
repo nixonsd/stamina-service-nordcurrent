@@ -10,7 +10,10 @@ export class EventService {
       if (event.type === 'LEVEL_START') {
         updated = StaminaService.spendStamina(updated, nowMs, 1);
       }
-      // LEVEL_FINISH and others are ignored for now
+      if (event.type === 'LEVEL_FINISH') {
+        updated = StaminaService.addStamina(updated, nowMs, 1);
+      }
+      // ... handle other event types as needed
     }
 
     return updated;

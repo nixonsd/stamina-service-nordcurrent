@@ -4,7 +4,7 @@ import { CreateUserUseCase } from '../application/use-cases/create-user.use-case
 import { PostgresUserRepository } from './repositories/postgres-user.repository';
 import { User } from '../domain/entities/user.entity';
 import { logger } from '../../shared/logger';
-import { sendApi } from 'src/shared/helpers/send-api.helper';
+import { sendApi } from '../../shared/helpers/send-api.helper';
 
 export function createUserController() {
   const router = Router();

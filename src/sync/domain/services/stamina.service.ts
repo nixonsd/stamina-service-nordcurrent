@@ -1,3 +1,4 @@
+import { BadRequestError } from '../../../shared/errors/app-error';
 import { User } from '../entities/user.entity';
 
 export class StaminaService {
@@ -19,18 +20,32 @@ export class StaminaService {
     return this.computeCurrent(s.staminaBase, s.staminaLastUpdateTs, s.staminaRegenPerSec, s.staminaMax, nowMs);
   }
 
-  static spendStamina(user: User, nowMs: number, cost: number): User {
+  static applyStaminaDelta(user: User, nowMs: number, delta: number): User {
     const current = this.getCurrentStamina(user, nowMs);
-    if (current < cost) throw new Error('NOT_ENOUGH_STAMINA');
+    const newBase = current + delta;
+
+    if (newBase < 0) {
+      throw new BadRequestError('NOT_ENOUGH_STAMINA');
+    }
+
+    const clamped = Math.min(user.stats.staminaMax, newBase);
 
     return {
       ...user,
       stats: {
         ...user.stats,
-        staminaBase: current - cost,
+        staminaBase: clamped,
         staminaLastUpdateTs: nowMs,
         stateVersion: user.stats.stateVersion + 1,
       },
     };
+  }
+
+  static spendStamina(user: User, nowMs: number, cost: number): User {
+    return this.applyStaminaDelta(user, nowMs, -cost);
+  }
+
+  static addStamina(user: User, nowMs: number, amount: number): User {
+    return this.applyStaminaDelta(user, nowMs, amount);
   }
 }

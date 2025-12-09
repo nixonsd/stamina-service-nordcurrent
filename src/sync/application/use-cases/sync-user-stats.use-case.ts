@@ -1,4 +1,4 @@
-import { NotFoundError } from '../../../shared/errors/app-error';
+import { ConflictError, NotFoundError } from '../../../shared/errors/app-error';
 import { UserRepository } from '../../domain/repositories/user.repository';
 import { SyncCommand, SyncResult } from '../types/sync.type';
 import { User } from '../../domain/entities/user.entity';
@@ -14,20 +14,23 @@ export class SyncUserStatsUseCase {
   public async execute(command: SyncCommand): Promise<SyncResult> {
     const nowMs = Date.now();
 
-    const currentUser = await this.userRepository.findById(command.userId);
-    if (!currentUser) {
-      throw new NotFoundError('The user stats were not found');
+    const user = await this.userRepository.findById(command.userId);
+    if (!user) {
+      throw new NotFoundError('The user stats were not found', { userId: command.userId });
     }
 
-    if (currentUser.status === 'BLOCKED') {
-      return this.buildResult(currentUser, nowMs);
+    if (user.status === 'BLOCKED') {
+      return this.buildResult(user, nowMs);
     }
 
-    // if (command.lastStateVersion < currentUser.stats.stateVersion) {
-    //   throw new ConflictError('State version conflict');
-    // }
+    const stats = user.stats;
 
-    const updatedUser: User = this.eventService.handle(currentUser, command.events, nowMs);
+    if (command.lastStateVersion < stats.stateVersion) {
+      const serverView = this.buildResult(user, nowMs);
+      throw new ConflictError('State version conflict', { ...serverView });
+    }
+
+    const updatedUser: User = this.eventService.handle(user, command.events, nowMs);
 
     await this.userRepository.save(updatedUser);
 

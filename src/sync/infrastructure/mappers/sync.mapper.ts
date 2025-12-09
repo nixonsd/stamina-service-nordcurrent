@@ -1,5 +1,6 @@
 import { SyncEventDto, SyncRequestDto, SyncResponseDto } from '../dtos/sync.dto';
-import { SyncCommand, SyncEvent, SyncResult } from '../../application/types/sync.type';
+import { SyncCommand, SyncResult } from '../../application/types/sync.type';
+import { GameEvent } from '../../domain/entities/game-event.entity';
 
 export function mapDtoToCommand(dto: SyncRequestDto): SyncCommand {
   return {
@@ -9,7 +10,7 @@ export function mapDtoToCommand(dto: SyncRequestDto): SyncCommand {
   };
 }
 
-export function mapEventDtoToEvent(dto: SyncEventDto): SyncEvent {
+export function mapEventDtoToEvent(dto: SyncEventDto): GameEvent {
   return {
     id: dto.id,
     type: dto.type,

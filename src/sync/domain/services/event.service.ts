@@ -1,9 +1,9 @@
 import { StaminaService } from './stamina.service';
 import { User } from '../entities/user.entity';
-import { Event } from '../entities/event.entity';
+import { GameEvent } from '../entities/game-event.entity';
 
 export class EventService {
-  handle(user: User, events: Event[], nowMs: number): User {
+  handle(user: User, events: GameEvent[], nowMs: number): User {
     let updated = user;
 
     for (const event of events) {

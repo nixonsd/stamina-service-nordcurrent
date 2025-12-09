@@ -1,14 +1,9 @@
-export interface SyncEvent {
-  id: string;
-  type: string;
-  clientTs: number;
-  payload?: Record<string, unknown>;
-}
+import { GameEvent } from '../../domain/entities/game-event.entity';
 
 export interface SyncCommand {
   userId: string;
   lastStateVersion: number;
-  events: SyncEvent[];
+  events: GameEvent[];
 }
 
 export interface SyncResult {

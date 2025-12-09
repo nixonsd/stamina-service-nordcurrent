@@ -35,6 +35,7 @@ export class PostgresDatabase {
       migrations: [__dirname + '/migrations/*.{ts,js}'],
       synchronize: false,
       logging: false,
+      ssl: config.db.ssl === true ? { rejectUnauthorized: false } : false,
     });
 
     try {

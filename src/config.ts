@@ -5,6 +5,7 @@ export interface Config {
     username: string;
     password: string;
     database: string;
+    ssl: boolean;
   };
   api: {
     port: number;
@@ -18,6 +19,7 @@ export const config: Config = {
     username: process.env.DB_USER || 'test_user',
     password: process.env.DB_PASSWORD || 'test_password',
     database: process.env.DB_NAME || 'nord_current_game_state',
+    ssl: process.env.DB_SSL === 'true' || false,
   },
   api: {
     port: Number(process.env.PORT) || 3000,

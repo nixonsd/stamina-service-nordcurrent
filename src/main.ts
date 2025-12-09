@@ -1,18 +1,44 @@
 import express from 'express';
+import { PostgresDatabase } from './postgres.db';
 import { logger } from './shared/logger';
+import { createSyncController } from './sync/infrastructure/sync.controller';
+import { errorHandler } from './shared/middlewares/error-handler.middleware';
+import { sendApi } from './shared/helpers/send-api.helper';
+import { config } from './config';
+import { createUserController } from './sync/infrastructure/user.controller';
 
-const app = express();
+async function bootstrap() {
+  try {
+    // Initialize the database connection
+    await PostgresDatabase.init();
+  } catch (error) {
+    logger.error(`Failed to initialize database: ${error}`);
+    process.exit(1);
+  }
 
-app.get('/', (req, res) => {
-  res.send('Stamina Service is running!');
-});
+  const app = express();
 
-app.post('/stamina', (req, res) => {
-  // Placeholder logic for stamina management
-  res.json({ message: 'Stamina updated successfully!' });
-});
+  // Middleware to parse JSON requests
+  app.use(express.json());
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  logger.info(`Server is listening on port ${PORT}`);
-});
+  app.get('/health', (req, res) => {
+    sendApi(res, 200, 'OK');
+  });
+
+  const syncRouter = createSyncController();
+  app.use('/sync', syncRouter);
+
+  const userRouter = createUserController();
+  app.use('/user', userRouter);
+
+  // Global error handler
+  app.use(errorHandler);
+
+  const PORT = config.api.port;
+  app.listen(PORT, () => {
+    logger.info(`Server is listening on port ${PORT}`);
+  });
+}
+
+// Start the application
+bootstrap().catch(logger.error);

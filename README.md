@@ -3,8 +3,6 @@
 A backend service for managing a regenerating stamina resource used by games.
 Designed as a technical exercise for Nordcurrent.
 
----
-
 ## 1. Overview
 
 The service stores stamina state on the server and updates it based on gameplay events submitted by the client.
@@ -15,8 +13,6 @@ This ensures:
 * Consistent and authoritative state
 * Low network usage
 * Persistence across app restarts and connectivity interruptions
-
----
 
 ## 2. Stamina Domain
 
@@ -56,8 +52,6 @@ Server:
 * Updates stamina state and version
 * Returns authoritative view back to client
 
----
-
 ## 3. API Overview
 
 ### Health Check
@@ -67,8 +61,6 @@ GET /health
 ```
 
 Returns status of the service.
-
----
 
 ### Create User
 
@@ -92,8 +84,6 @@ Response example:
   }
 }
 ```
-
----
 
 ### Synchronization
 
@@ -147,8 +137,6 @@ Conflict response (client behind state):
 }
 ```
 
----
-
 ## 4. Running the Application
 
 ### 4.1 Requirements
@@ -191,8 +179,6 @@ Verify:
 curl http://localhost:PORT/health
 ```
 
----
-
 ## 5. Testing Common Scenarios
 
 1. Create test user
@@ -232,8 +218,6 @@ Request Example:
     ]
 }
 ```
-
----
 
 ## 6. Potential Enhancements
 * Persistent event storage with anti-cheat validation based on previous events and timestamps

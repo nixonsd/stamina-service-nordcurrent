@@ -25,10 +25,10 @@ async function bootstrap() {
     sendApi(res, 200, 'OK');
   });
 
-  const syncRouter = await createSyncController();
+  const syncRouter = createSyncController();
   app.use('/sync', syncRouter);
 
-  const userRouter = await createUserController();
+  const userRouter = createUserController();
   app.use('/user', userRouter);
 
   // Global error handler

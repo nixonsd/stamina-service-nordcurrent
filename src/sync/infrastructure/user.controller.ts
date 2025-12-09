@@ -19,7 +19,7 @@ export function createUserController() {
 
       // Default initial stamina configuration
       const INITIAL_STAMINA_MAX = 10;
-      const INITIAL_REGEN_PER_SEC = 1 / 30; // fully recover in ~5 mins
+      const INITIAL_REGEN_PER_SEC = 1 / 30; // fully recover in ~ 30 secs
 
       const user: User = {
         id: userId,
@@ -35,7 +35,6 @@ export function createUserController() {
           staminaRegenPerSec: INITIAL_REGEN_PER_SEC,
           stateVersion: 1,
         },
-        ...req.body, // allow client to override non-stamina fields if needed
       };
 
       const createdUser = await createUserUseCase.execute(user);

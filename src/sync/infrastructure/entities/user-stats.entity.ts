@@ -30,13 +30,13 @@ export class UserStatsEntity {
     default: 10,
     transformer: {
       to: (value: number) => value,
-      from: (value: string | null) => (value === null ? 0 : parseFloat(value)),
+      from: (value: string | null) => (value === null ? 0 : parseInt(value, 10)),
     },
   })
   staminaBase!: number;
 
   @Column({ name: 'stamina_last_update_ts', type: 'bigint' })
-  staminaLastUpdateTs!: number; // seconds since epoch
+  staminaLastUpdateTs!: number; // milliseconds since epoch
 
   @Column({
     name: 'stamina_regen_per_sec',

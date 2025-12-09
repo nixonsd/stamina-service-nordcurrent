@@ -4,7 +4,7 @@ import { UserStats } from './user-stats.entity';
 export interface User {
   id: string;
   status: UserStatus;
-  blockedAt: number | null; // Unix time in seconds, null if not blocked
+  blockedAt: number | null; // Unix time in milliseconds, null if not blocked
 
   createdAt: Date;
   updatedAt: Date;

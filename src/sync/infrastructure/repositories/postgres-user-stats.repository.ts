@@ -16,10 +16,6 @@ export class PostgresUserStatsRepository implements UserStatsRepository {
     return entity ? (entity as unknown as UserStats) : null;
   }
 
-  async update(_user: UserStats): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-
   async save(userStats: UserStats): Promise<UserStats> {
     const entity = this.userStatsRepository.create(userStats as unknown as UserStatsEntity);
     await this.userStatsRepository.save(entity);

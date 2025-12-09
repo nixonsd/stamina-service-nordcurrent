@@ -3,7 +3,7 @@ export interface UserStats {
 
   staminaMax: number;
   staminaBase: number; // value at staminaLastUpdateTs
-  staminaLastUpdateTs: number; // server time (sec since epoch)
+  staminaLastUpdateTs: number; // server time (ms since epoch)
   staminaRegenPerSec: number;
 
   stateVersion: number;

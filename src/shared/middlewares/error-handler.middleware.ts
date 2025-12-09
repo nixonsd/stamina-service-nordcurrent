@@ -14,6 +14,7 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
     data = err.data;
   } else if (err instanceof Error) {
     logger.error(err);
+    message = err.message;
   }
 
   sendApi(res, status, message, data);

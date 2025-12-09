@@ -6,7 +6,7 @@ import { SyncRequestDto, SyncResponseDto } from './dtos/sync.dto';
 import { mapDtoToCommand, mapResultToDto } from './mappers/sync.mapper';
 import { EventService } from '../domain/services/event.service';
 
-export async function createSyncController() {
+export function createSyncController() {
   const router = Router();
 
   // Dependency wiring done at runtime

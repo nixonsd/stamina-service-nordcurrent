@@ -25,7 +25,7 @@ export class SyncUserStatsUseCase {
 
     const stats = user.stats;
 
-    if (command.lastStateVersion < stats.stateVersion) {
+    if (command.lastStateVersion !== stats.stateVersion) {
       const serverView = this.buildResult(user, nowMs);
       throw new ConflictError('State version conflict', { ...serverView });
     }

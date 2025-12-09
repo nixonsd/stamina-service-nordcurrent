@@ -32,6 +32,7 @@ export class PostgresDatabase {
       password: config.db.password,
       database: config.db.database,
       entities,
+      migrations: [__dirname + '/migrations/*.{ts,js}'],
       synchronize: false,
       logging: false,
     });

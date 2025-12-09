@@ -5,7 +5,7 @@
   "description": "Stamina Service exercise application for Nordcurrent",
   "main": "main.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm prune --omit=dev",
     "migrate": "node ./dist/scripts/run-migrations",
     "start": "node ./dist/main",
     "lint": "eslint .",
